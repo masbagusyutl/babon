@@ -78,9 +78,22 @@ def run_tasks_every_2_hours(params):
             charge_battery(base_charge_battery_url + param)
             repair_fingers(base_repair_fingers_url + param)
 
-        print("Semua akun sudah diproses. Menunggu 2 jam...")
-        countdown(2 * 60 * 60)  # 2 jam dalam detik
+        print("Proses semua akun untuk tugas charge battery dan repair finger selesai")
+        two_hour_seconds = 2 * 60 * 60
+        daily_task_seconds = time_until_next_7am_wib()
+        
+        while two_hour_seconds > 0 or daily_task_seconds > 0:
+            now = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=7)))
+            two_hour_seconds -= 1
+            daily_task_seconds -= 1
 
+            print(f"Waktu tersisa untuk memulai ulang: {format_seconds(two_hour_seconds)}")
+            print(f"Saat ini juga masih menunggu tugas harian pada jam 7 WIB")
+            print(f"Waktu tersisa untuk tugas harian: {format_seconds(daily_task_seconds)}")
+            print(f"Jam saat ini: {now.strftime('%H:%M:%S WIB')}", end='\r')
+
+            time.sleep(1)
+        
 # Fungsi untuk menjalankan tugas harian pada jam 7 WIB
 def run_daily_tasks_at_7(params):
     while True:
@@ -104,9 +117,24 @@ def countdown(seconds):
         mins, secs = divmod(seconds, 60)
         hours, mins = divmod(mins, 60)
         timeformat = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
-        print(timeformat, end='\r')
+        print(f"Waktu tersisa untuk tugas harian: {timeformat}", end='\r')
         time.sleep(1)
         seconds -= 1
+    print()  # Newline after countdown is complete
+
+# Fungsi untuk menghitung waktu hingga jam 7 WIB berikutnya
+def time_until_next_7am_wib():
+    now = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=7)))  # Waktu WIB
+    next_run = now.replace(hour=7, minute=0, second=0, microsecond=0)
+    if now > next_run:
+        next_run += timedelta(days=1)
+    return (next_run - now).seconds
+
+# Fungsi untuk format detik menjadi jam:menit:detik
+def format_seconds(seconds):
+    mins, secs = divmod(seconds, 60)
+    hours, mins = divmod(mins, 60)
+    return '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
 
 # Main function
 if __name__ == "__main__":
