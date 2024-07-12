@@ -89,10 +89,7 @@ def run_tasks_every_2_hours(params):
             formatted_daily_task = format_seconds(daily_task_seconds)
             current_time = now.strftime('%H:%M:%S WIB')
             
-            print(f"Waktu tersisa untuk memulai ulang: {formatted_two_hour}", end='\r')
-            print(f"Saat ini juga masih menunggu tugas harian pada jam 7 WIB")
-            print(f"Waktu tersisa untuk tugas harian: {formatted_daily_task}", end='\r')
-            print(f"Jam saat ini: {current_time}", end='\r')
+            print(f"Waktu tersisa untuk memulai ulang battery: {formatted_two_hour}", end='\r')
             
             time.sleep(1)
             two_hour_seconds -= 1
