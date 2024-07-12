@@ -70,4 +70,40 @@ def read_params_from_file(file_path):
         params = file.readlines()
     return [param.strip() for param in params]
 
-# Fungsi untuk menjalankan tugas setiap 14 jam
+# Fungsi untuk menjalankan tugas setiap 2 jam
+def run_tasks_every_2_hours(params):
+    while True:
+        for param in params:
+            charge_battery(base_charge_battery_url + param)
+            repair_fingers(base_repair_fingers_url + param)
+
+        print("Semua akun sudah diproses. Menunggu 2 jam...")
+        countdown(2 * 60 * 60)  # 2 jam dalam detik
+
+# Fungsi untuk menjalankan tugas harian
+def run_daily_tasks(params):
+    for param in params:
+        claim_daily_reward(base_claim_daily_url + param)
+        claim_daily_combo_reward(base_claim_daily_combo_url + param)
+    
+    print("Semua akun sudah diproses untuk tugas harian. Menunggu 24 jam...")
+    countdown(24 * 60 * 60)  # 24 jam dalam detik
+
+# Fungsi untuk hitung mundur
+def countdown(seconds):
+    while seconds:
+        mins, secs = divmod(seconds, 60)
+        hours, mins = divmod(mins, 60)
+        timeformat = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
+        print(timeformat, end='\r')
+        time.sleep(1)
+        seconds -= 1
+
+# Main function
+if __name__ == "__main__":
+    file_path = 'data.txt'  # Ganti dengan path yang sesuai
+    params = read_params_from_file(file_path)
+
+    while True:
+        run_daily_tasks(params)
+        run_tasks_every_2_hours(params)
