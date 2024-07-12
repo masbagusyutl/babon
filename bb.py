@@ -88,10 +88,11 @@ def run_tasks_every_2_hours(params):
             daily_task_seconds -= 1
 
             print(f"Waktu tersisa untuk memulai ulang: {format_seconds(two_hour_seconds)}")
+            time.sleep(1)
             print(f"Saat ini juga masih menunggu tugas harian pada jam 7 WIB")
             print(f"Waktu tersisa untuk tugas harian: {format_seconds(daily_task_seconds)}")
+            time.sleep(1)
             print(f"Jam saat ini: {now.strftime('%H:%M:%S WIB')}", end='\r')
-
             time.sleep(1)
         
 # Fungsi untuk menjalankan tugas harian pada jam 7 WIB
