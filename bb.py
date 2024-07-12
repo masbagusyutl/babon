@@ -80,7 +80,8 @@ def run_tasks_every_2_hours(params):
 
         print("Semua akun proses untuk tugas charge battery dan repair finger selesai")
         
-        time.sleep(2 * 60 * 60)  # Tunggu 2 jam
+        # Mulai hitung mundur untuk 2 jam
+        countdown(2 * 60 * 60)
 
 # Fungsi untuk menjalankan tugas harian pada jam 7 WIB
 def run_daily_tasks_at_7(params):
@@ -101,11 +102,8 @@ def run_daily_tasks_at_7(params):
 
 # Fungsi untuk hitung mundur
 def countdown(seconds):
-    while seconds:
-        mins, secs = divmod(seconds, 60)
-        hours, mins = divmod(mins, 60)
-        timeformat = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
-        print(f"Waktu tersisa: {timeformat}")
+    while seconds > 0:
+        print(f"Waktu tersisa: {seconds} detik", end='\r')
         time.sleep(1)
         seconds -= 1
     print()  # Newline after countdown is complete
