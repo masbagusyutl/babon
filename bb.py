@@ -1,6 +1,6 @@
 import requests
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # URL dasar untuk pengisian energi, klaim hadiah harian, klaim hadiah combo harian, dan perbaikan jari
 base_charge_battery_url = "https://baboon-telegram.onrender.com/game/chargeBattery?tgInitData="
@@ -73,21 +73,30 @@ def read_params_from_file(file_path):
 # Fungsi untuk menjalankan tugas setiap 2 jam
 def run_tasks_every_2_hours(params):
     while True:
-        for param in params:
+        for i, param in enumerate(params):
+            print(f"Memproses akun {i + 1} dari {len(params)}")
             charge_battery(base_charge_battery_url + param)
             repair_fingers(base_repair_fingers_url + param)
 
         print("Semua akun sudah diproses. Menunggu 2 jam...")
         countdown(2 * 60 * 60)  # 2 jam dalam detik
 
-# Fungsi untuk menjalankan tugas harian
-def run_daily_tasks(params):
-    for param in params:
-        claim_daily_reward(base_claim_daily_url + param)
-        claim_daily_combo_reward(base_claim_daily_combo_url + param)
-    
-    print("Semua akun sudah diproses untuk tugas harian. Menunggu 24 jam...")
-    countdown(24 * 60 * 60)  # 24 jam dalam detik
+# Fungsi untuk menjalankan tugas harian pada jam 7 WIB
+def run_daily_tasks_at_7(params):
+    while True:
+        now = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=7)))  # Waktu WIB
+        next_run = now.replace(hour=7, minute=0, second=0, microsecond=0)
+        if now > next_run:
+            next_run += timedelta(days=1)
+        countdown((next_run - now).seconds)
+
+        for i, param in enumerate(params):
+            print(f"Memproses akun {i + 1} dari {len(params)}")
+            claim_daily_reward(base_claim_daily_url + param)
+            claim_daily_combo_reward(base_claim_daily_combo_url + param)
+        
+        print("Semua akun sudah diproses untuk tugas harian. Menunggu hingga jam 7 WIB berikutnya...")
+        countdown(24 * 60 * 60)  # 24 jam dalam detik
 
 # Fungsi untuk hitung mundur
 def countdown(seconds):
@@ -104,6 +113,9 @@ if __name__ == "__main__":
     file_path = 'data.txt'  # Ganti dengan path yang sesuai
     params = read_params_from_file(file_path)
 
-    while True:
-        run_daily_tasks(params)
-        run_tasks_every_2_hours(params)
+    # Menjalankan tugas setiap 2 jam dalam thread terpisah
+    import threading
+    threading.Thread(target=run_tasks_every_2_hours, args=(params,)).start()
+
+    # Menjalankan tugas harian pada jam 7 WIB
+    run_daily_tasks_at_7(params)
