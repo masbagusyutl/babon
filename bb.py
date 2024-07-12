@@ -78,22 +78,25 @@ def run_tasks_every_2_hours(params):
             charge_battery(base_charge_battery_url + param)
             repair_fingers(base_repair_fingers_url + param)
 
-        print("Semua akun sudah diproses untuk tugas charge battery dan repair finger")
+        print("Semua akun proses untuk tugas charge battery dan repair finger selesai")
+
         two_hour_seconds = 2 * 60 * 60
         daily_task_seconds = time_until_next_7am_wib()
-        
+
         while two_hour_seconds > 0 or daily_task_seconds > 0:
             now = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=7)))
+            formatted_two_hour = format_seconds(two_hour_seconds)
+            formatted_daily_task = format_seconds(daily_task_seconds)
+            current_time = now.strftime('%H:%M:%S WIB')
+
+            print(f"Waktu tersisa untuk memulai ulang: {formatted_two_hour}\n"
+                  f"Saat ini juga masih menunggu tugas harian pada jam 7 WIB\n"
+                  f"Waktu tersisa untuk tugas harian: {formatted_daily_task}\n"
+                  f"Jam saat ini: {current_time}", end='\r')
+
+            time.sleep(1)
             two_hour_seconds -= 1
             daily_task_seconds -= 1
-
-            print(f"Waktu tersisa untuk memulai ulang: {format_seconds(two_hour_seconds)}")
-            time.sleep(1)
-            print(f"Saat ini juga masih menunggu tugas harian pada jam 7 WIB")
-            print(f"Waktu tersisa untuk tugas harian: {format_seconds(daily_task_seconds)}")
-            time.sleep(1)
-            print(f"Jam saat ini: {now.strftime('%H:%M:%S WIB')}", end='\r')
-            time.sleep(1)
         
 # Fungsi untuk menjalankan tugas harian pada jam 7 WIB
 def run_daily_tasks_at_7(params):
