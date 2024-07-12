@@ -78,7 +78,7 @@ def run_tasks_every_2_hours(params):
             charge_battery(base_charge_battery_url + param)
             repair_fingers(base_repair_fingers_url + param)
 
-        print("Proses semua akun untuk tugas charge battery dan repair finger selesai")
+        print("Semua akun sudah diproses untuk tugas charge battery dan repair finger")
         two_hour_seconds = 2 * 60 * 60
         daily_task_seconds = time_until_next_7am_wib()
         
@@ -117,7 +117,7 @@ def countdown(seconds):
         mins, secs = divmod(seconds, 60)
         hours, mins = divmod(mins, 60)
         timeformat = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
-        print(f"Waktu tersisa untuk tugas harian: {timeformat}", end='\r')
+        print(f"Waktu tersisa: {timeformat}", end='\r')
         time.sleep(1)
         seconds -= 1
     print()  # Newline after countdown is complete
