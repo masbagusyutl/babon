@@ -70,7 +70,7 @@ def read_params_from_file(file_path):
         params = file.readlines()
     return [param.strip() for param in params]
 
-# Fungsi untuk menjalankan tugas setiap 2 jam
+# Fungsi untuk menjalankan tugas pengisian energi dan perbaikan jari setiap 2 jam
 def run_tasks_every_2_hours(params):
     while True:
         for i, param in enumerate(params):
@@ -83,19 +83,14 @@ def run_tasks_every_2_hours(params):
         # Mulai countdown untuk 2 jam
         countdown(2 * 60 * 60, "Waktu tersisa untuk memulai ulang: ")
 
-# Fungsi untuk menjalankan tugas harian pada jam 7 WIB
-def run_daily_tasks_at_7(params):
-    while True:
-        next_run = calculate_next_run_7()
-        countdown((next_run - datetime.now()).seconds, "Waktu tersisa untuk tugas harian: ")
-
-        for i, param in enumerate(params):
-            print(f"Memproses akun {i + 1} dari {len(params)}")
-            claim_daily_reward(base_claim_daily_url + param)
-            claim_daily_combo_reward(base_claim_daily_combo_url + param)
-        
-        print("Semua akun sudah diproses untuk tugas harian. Menunggu hingga jam 7 WIB berikutnya...")
-        time.sleep(24 * 60 * 60)  # Tunggu 24 jam
+# Fungsi untuk menjalankan tugas harian
+def run_daily_tasks(params):
+    for i, param in enumerate(params):
+        print(f"Memproses akun {i + 1} dari {len(params)}")
+        claim_daily_reward(base_claim_daily_url + param)
+        claim_daily_combo_reward(base_claim_daily_combo_url + param)
+    
+    print("Semua akun sudah diproses untuk tugas harian.")
 
 # Fungsi untuk hitung mundur dengan pesan tambahan
 def countdown(seconds, message):
@@ -113,15 +108,34 @@ def calculate_next_run_7():
         next_run += timedelta(days=1)
     return next_run
 
-# Main function
-if __name__ == "__main__":
+# Fungsi utama
+def main():
     file_path = 'data.txt'  # Ganti dengan path yang sesuai
     params = read_params_from_file(file_path)
-
+    
+    # Jalankan tugas harian dan tugas pengisian energi dan perbaikan jari saat pertama kali dijalankan
+    print("Menjalankan tugas harian dan tugas pengisian energi dan perbaikan jari pertama kali...")
+    run_daily_tasks(params)
+    run_tasks_every_2_hours(params)
+    
+    # Hitung waktu untuk tugas harian berikutnya
+    next_daily_task_time = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=7))) + timedelta(days=1)
+    next_daily_task_time = next_daily_task_time.replace(hour=7, minute=0, second=0, microsecond=0)
+    
     while True:
-        # Menjalankan tugas setiap 2 jam dalam thread terpisah
-        import threading
-        threading.Thread(target=run_tasks_every_2_hours, args=(params,)).start()
+        # Jika sudah waktu untuk tugas harian, jalankan tugas harian
+        if datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=7))) >= next_daily_task_time:
+            run_daily_tasks(params)
+            next_daily_task_time += timedelta(days=1)
+        
+        # Jalankan tugas pengisian energi dan perbaikan jari setiap 2 jam
+        print("Menunggu untuk tugas pengisian energi dan perbaikan jari berikutnya...")
+        countdown(2 * 60 * 60, "Waktu tersisa untuk tugas pengisian energi dan perbaikan jari: ")
+        run_tasks_every_2_hours(params)
+        
+        # Hitung waktu hingga tugas harian berikutnya
+        daily_task_seconds = (next_daily_task_time - datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=7)))).seconds
+        countdown(daily_task_seconds, "Waktu tersisa untuk tugas harian: ")
 
-        # Menjalankan tugas harian pada jam 7 WIB
-        run_daily_tasks_at_7(params)
+if __name__ == "__main__":
+    main()
